@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Share File.io</string>
+    <string name="notification_uploading_content_text">Please wait. Uploading is in progress .</string>
+    <string name="notification_done_title">Done</string>
+    <string name="notification_done_content_text">Copied to clipboard\n%1$s</string>
+    <string name="exception_size">File size should be less then 5 Gb.</string>
+    <string name="exception_filename">Can\'t get filename.</string>
+</resources>
