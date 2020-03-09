@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,8 +30,15 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".ForegroundService"
-            android:enabled="true" />
+            android:name=".service.FileIOForegroundService"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver android:name=".broadcastReceiver.FileIOBroadcastReceiver">
+            <intent-filter>
+                <action android:name="com.fedorov.fileioshare.ACTION_COPY_URL" />
+                <action android:name="com.fedorov.fileioshare.ACTION_SHARE_URL" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

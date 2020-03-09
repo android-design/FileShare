@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">Share File.io</string>
     <string name="notification_uploading_content_text">Please wait. Uploading is in progress .</string>
-    <string name="notification_done_title">Done</string>
+    <string name="notification_done_title">Done %1$s</string>
     <string name="notification_done_content_text">Copied to clipboard\n%1$s</string>
     <string name="exception_size">File size should be less then 5 Gb.</string>
     <string name="exception_filename">Can\'t get filename.</string>
+    <string name="notification_done_error_content_text">Error occurred while upload</string>
+    <string name="notification_action_copy_title">Copy url</string>
+    <string name="toast_url_copied">Url copied</string>
+    <string name="notification_action_share_title">Share</string>
+    <string name="toast_no_app">No application for sharing</string>
+    <string name="faq_terms_of_service_and_privacy_policy"><a href="https://www.file.io/">FAQ, Terms of Service and Privacy policy</a></string>
+    <string name="app_description">The application allows you to share files (videos, pictures, etc.) using the Android method to Share.\n Files are stored on the File.io server (by default for 2 weeks).\n The limit for one file is 5 gigabytes.\n After the link is used, the file is automatically deleted from the server.\n After the file is uploaded to the server, the link is automatically copied to the clipboard.\n It is also possible to copy / share the link using notifications.\n\n Thanks to File.io for their service!</string>
 </resources>

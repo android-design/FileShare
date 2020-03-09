@@ -4,6 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:padding="8dp"
+    tools:context=".view.MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_description"
+        android:textColor="@color/primaryTextColor" />
+
+    <TextView
+        android:id="@+id/file_io_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="@string/faq_terms_of_service_and_privacy_policy"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="15sp"
+        android:textStyle="bold|italic" />
+
 
 </LinearLayout>
