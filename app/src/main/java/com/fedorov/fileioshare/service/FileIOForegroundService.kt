@@ -132,8 +132,8 @@ class FileIOForegroundService : Service() {
             )
             .setSmallIcon(R.drawable.folder_bw)
             .setContentTitle(getString(R.string.notification_done_title, fileName))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setGroup(GROUP_KEY_UPLOAD_FILE)
+            .setGroup("GROUP_KEY_UPLOAD_FILE")
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         if (!isError) {
             val copyUrlIntent = Intent(this, FileIOBroadcastReceiver::class.java).apply {
@@ -172,7 +172,21 @@ class FileIOForegroundService : Service() {
         }
 
         with(NotificationManagerCompat.from(this@FileIOForegroundService)) {
-            notify(url, notificationId, builder.build())
+            notify(notificationId, builder.build())
+        }
+
+        val groupSummary = NotificationCompat.Builder(
+                this@FileIOForegroundService,
+                CHANNEL_ID
+            )
+            .setSmallIcon(R.drawable.folder_bw)
+            .setGroupSummary(true)
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
+            .setGroup("GROUP_KEY_UPLOAD_FILE")
+
+        NotificationManagerCompat.from(this).apply {
+            notify(notificationId, builder.build())
+            notify(3, groupSummary.build())
         }
     }
 

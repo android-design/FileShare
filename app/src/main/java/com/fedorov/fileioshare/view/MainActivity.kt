@@ -3,9 +3,7 @@ package com.fedorov.fileioshare.view
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.method.LinkMovementMethod
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -24,7 +22,7 @@ import java.io.File
 
 class MainActivity : MvpAppCompatActivity(), MainView {
 
-    private val presenter by moxyPresenter { MainPresenter(FileHandlerImpl(applicationContext)) }
+    private val presenter by moxyPresenter { MainPresenter(applicationContext, FileHandlerImpl(applicationContext)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,10 +69,17 @@ class MainActivity : MvpAppCompatActivity(), MainView {
     override fun handleIntent() {
         when (intent?.action) {
             Intent.ACTION_SEND -> {
-                (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
-                    ?.let { uri ->
-                        presenter.getFileFromUri(uri, cacheDir)
-                    }
+//                GlobalScope.async(Dispatchers.Default) {
+//                    (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+//                        ?.let { uri ->
+//                            presenter.getFileFromUri(uri, cacheDir)
+//                        }
+//                }
+                presenter.starting(intent, cacheDir)
+            }
+            else -> {
+                // Url to site file.io
+                file_io_link.movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
