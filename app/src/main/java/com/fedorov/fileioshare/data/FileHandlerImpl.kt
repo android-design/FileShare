@@ -1,11 +1,13 @@
 package com.fedorov.fileioshare.data
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import com.fedorov.fileioshare.presenter.toFile
 import java.io.File
+
 
 class FileHandlerImpl(private val context: Context) : FileHandler {
 
@@ -19,11 +21,9 @@ class FileHandlerImpl(private val context: Context) : FileHandler {
         } catch (e: Exception) {
             // TODO: Timber time ;)
             Log.d("Test", "")
-
-            return uri.path?.substringAfterLast("/") ?: ""
         }
 
-        return ""
+        return uri.path?.substringAfterLast("/") ?: ""
     }
 
     override fun getFileOutput(uri: Uri, cacheDir: File): File? {
@@ -35,12 +35,14 @@ class FileHandlerImpl(private val context: Context) : FileHandler {
                 throw IllegalStateException("Filename not found")
             }
 
+
             context.contentResolver.openInputStream(uri)
                 ?.let { stream ->
                     return stream.toFile(fileName, cacheDir)
                 }
         } catch (e: Exception) {
             // TODO: Timber time.
+            Log.d("Errore", e.localizedMessage!!)
         }
         return null
     }

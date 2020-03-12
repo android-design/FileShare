@@ -14,12 +14,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import moxy.MvpPresenter
-import moxy.presenterScope
 import java.io.File
 
 class MainPresenter(private val context: Context, private val contentResolver: FileHandler) : MvpPresenter<MainView>() {
 
-    fun getFileFromUri(uri: Uri, cacheDir: File) {
+    private fun getFileFromUri(uri: Uri, cacheDir: File) {
         GlobalScope.launch(Dispatchers.IO) {
             val file = contentResolver.getFileOutput(uri, cacheDir)
 
@@ -28,13 +27,14 @@ class MainPresenter(private val context: Context, private val contentResolver: F
                     startForegroundService(it)
                 } else {
                     withContext(Dispatchers.Main) {
+                        // TODO Rewrite to notifications.
                         //viewState.showError("File size should be less then 5 Gb.")
                     }
                 }
             } ?: withContext(Dispatchers.Main) {
+                // TODO Rewrite to notifications.
                 //viewState.showError("Not success")
             }
-            viewState.finishActivity()
         }
     }
 
@@ -43,14 +43,21 @@ class MainPresenter(private val context: Context, private val contentResolver: F
     }
 
     fun starting(intent: Intent, cacheDir:File){
-        viewState.finishActivity()
+//        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
                         ?.let { uri ->
-                            getFileFromUri(uri, cacheDir)
+//                            val photoPickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+//                            photoPickerIntent.data = uri
+
+                                getFileFromUri(uri, cacheDir)
+
+                                viewState.finishActivity()
+
+
                         }
     }
 
-    fun startForegroundService(file: File) {
+    private fun startForegroundService(file: File) {
         val serviceIntent = Intent(context, FileIOForegroundService::class.java)
         serviceIntent.putExtra(ACTION_INTENT_KEY, file)
         ContextCompat.startForegroundService(context, serviceIntent)

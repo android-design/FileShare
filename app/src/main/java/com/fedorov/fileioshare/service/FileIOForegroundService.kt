@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.*
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.fedorov.fileioshare.*
@@ -20,9 +21,12 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class FileIOForegroundService : Service() {
+
+    private val countUploading = AtomicInteger(0)
 
     private val client by lazy {
         OkHttpClient.Builder()
@@ -31,8 +35,10 @@ class FileIOForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+
+        countUploading.incrementAndGet()
+
         val file = intent.extras?.get(ACTION_INTENT_KEY) as? File
-//        val type = intent.getStringExtra("TYPE")
 
         file?.let {
             createNotificationChannel()
@@ -52,10 +58,10 @@ class FileIOForegroundService : Service() {
             try {
                 handleSendFile(file)
             } catch (e: Exception) {
-                stopSelf()
+                stopService()
             }
 
-        } ?: stopSelf()
+        } ?: stopService()
 
         return START_NOT_STICKY
     }
@@ -79,7 +85,7 @@ class FileIOForegroundService : Service() {
     private fun handleSendFile(file: File) {
         GlobalScope.launch(Dispatchers.Default) {
             makeRequest(file)
-            stopSelf()
+            stopService()
         }
     }
 
@@ -133,7 +139,7 @@ class FileIOForegroundService : Service() {
             .setSmallIcon(R.drawable.folder_bw)
             .setContentTitle(getString(R.string.notification_done_title, fileName))
             .setGroup("GROUP_KEY_UPLOAD_FILE")
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         if (!isError) {
             val copyUrlIntent = Intent(this, FileIOBroadcastReceiver::class.java).apply {
@@ -191,4 +197,11 @@ class FileIOForegroundService : Service() {
     }
 
     private fun notificationId() = SystemClock.uptimeMillis().toInt()
+
+    private fun stopService() {
+        // Stop service only when it is last uploading process.
+        if (countUploading.decrementAndGet() == 0) {
+            stopSelf()
+        }
+    }
 }
