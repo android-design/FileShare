@@ -3,6 +3,7 @@ package com.fedorov.fileioshare.utils
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.SystemClock
 import com.fedorov.fileioshare.CLIPBOARD_LABEL
 
 fun setTextToClipboard(context: Context, text: String?) {
@@ -15,3 +16,5 @@ fun setTextToClipboard(context: Context, text: String?) {
         )
     clipboard.setPrimaryClip(clip)
 }
+
+fun notificationId() = SystemClock.uptimeMillis().toInt()

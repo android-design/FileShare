@@ -1,6 +1,8 @@
 package com.fedorov.fileioshare.broadcastReceiver
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import com.fedorov.fileioshare.ACTION_COPY_URL
 import com.fedorov.fileioshare.ACTION_SHARE_URL
@@ -21,32 +23,42 @@ class FileIOBroadcastReceiver : BroadcastReceiver() {
                     url
                 )
 
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.toast_url_copied),
-                    Toast.LENGTH_LONG
-                )
-                    .show()
+                closeStatusBar(context)
+
+                showToast(context, context.getString(R.string.toast_url_copied))
             }
+
             ACTION_SHARE_URL -> {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, url)
-                    type = "text/plain"
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK;
-                }
+                val shareTextIntent = getShareTextIntent(url)
 
                 if (intent.resolveActivity(context.packageManager) != null) {
-                    context.startActivity(sendIntent)
+                    context.startActivity(shareTextIntent)
+                    closeStatusBar(context)
                 } else {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.toast_no_app),
-                        Toast.LENGTH_LONG
-                    )
-                        .show()
+                    showToast(context, context.getString(R.string.toast_no_app))
                 }
             }
         }
+    }
+
+    private fun getShareTextIntent(url: String?) = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, url)
+        type = "text/plain"
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+    }
+
+    private fun showToast(context: Context, text: String) {
+        Toast.makeText(
+                context,
+                text,
+                Toast.LENGTH_LONG
+            )
+            .show()
+    }
+
+    private fun closeStatusBar(context: Context) {
+        val closeIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+        context.sendBroadcast(closeIntent)
     }
 }

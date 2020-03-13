@@ -12,4 +12,7 @@
     <string name="toast_no_app">No application for sharing</string>
     <string name="faq_terms_of_service_and_privacy_policy"><a href="https://www.file.io/">FAQ, Terms of Service and Privacy policy</a></string>
     <string name="app_description">The application allows you to share files (videos, pictures, etc.) using the Android method to Share.\n Files are stored on the File.io server (by default for 2 weeks).\n The limit for one file is 5 gigabytes.\n After the link is used, the file is automatically deleted from the server.\n After the file is uploaded to the server, the link is automatically copied to the clipboard.\n It is also possible to copy / share the link using notifications.\n\n Thanks to File.io for their service!</string>
+    <string name="error_can_not_read_file">Can\'t read file.</string>
+    <string name="error_file_size">file size should be less then 5 Gb.</string>
+    <string name="image_description_updating">Updating</string>
 </resources>
