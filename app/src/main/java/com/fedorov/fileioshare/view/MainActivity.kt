@@ -8,9 +8,10 @@ import android.text.method.LinkMovementMethod
 import com.fedorov.fileioshare.R
 import com.fedorov.fileioshare.data.FileHandlerImpl
 import com.fedorov.fileioshare.presenter.MainPresenter
-import kotlinx.android.synthetic.main.activity_main.*
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.fedorov.fileioshare.databinding.ActivityMainBinding
 
 
 class MainActivity : MvpAppCompatActivity(), MainView {
@@ -21,6 +22,8 @@ class MainActivity : MvpAppCompatActivity(), MainView {
             FileHandlerImpl(applicationContext)
         )
     }
+
+    private val mainViewBinding by viewBinding(ActivityMainBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +45,7 @@ class MainActivity : MvpAppCompatActivity(), MainView {
                 setContentView(R.layout.activity_main)
 
                 // Url to site file.io
-                file_io_link.movementMethod = LinkMovementMethod.getInstance()
+                mainViewBinding.fileIoLink.movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
