@@ -48,11 +48,8 @@ dependencies {
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
-    // Moxy
-    implementation "com.github.moxy-community:moxy:$moxy_version"
-    kapt "com.github.moxy-community:moxy-compiler:$moxy_version"
-    implementation "com.github.moxy-community:moxy-androidx:$moxy_version"
-    implementation "com.github.moxy-community:moxy-ktx:$moxy_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation "androidx.activity:activity-ktx:1.4.0"
 
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
