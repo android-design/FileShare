@@ -1,4 +1,4 @@
-package com.fedorov.fileioshare.presenter
+package com.fedorov.fileioshare.utils
 
 import java.io.File
 import java.io.FileOutputStream

@@ -12,7 +12,7 @@ import com.fedorov.fileioshare.*
 import com.fedorov.fileioshare.broadcastReceiver.FileIOBroadcastReceiver
 import com.fedorov.fileioshare.utils.notificationId
 import com.fedorov.fileioshare.utils.setTextToClipboard
-import com.fedorov.fileioshare.view.NotificationImpl
+import com.fedorov.fileioshare.utils.NotificationImpl
 import kotlinx.coroutines.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
