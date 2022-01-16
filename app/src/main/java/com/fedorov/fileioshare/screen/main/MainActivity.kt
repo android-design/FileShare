@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.fedorov.fileioshare.R
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.fedorov.fileioshare.databinding.ActivityMainBinding
+import com.fedorov.fileioshare.dispatcherProvider
 import com.fedorov.fileioshare.screen.model.ApplicationState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
@@ -23,7 +24,8 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModelFactory: ViewModelProvider.Factory by lazy(mode = LazyThreadSafetyMode.NONE) {
         MainViewModelFactory(
-            applicationContext
+            applicationContext,
+            applicationContext.dispatcherProvider,
         )
     }
     private val viewModel: MainViewModel by viewModels {

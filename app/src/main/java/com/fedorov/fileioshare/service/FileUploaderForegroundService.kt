@@ -22,13 +22,19 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
 
 
 class FileUploaderForegroundService : Service() {
 
     private val countUploading = AtomicInteger(0)
+    private val defaultExceptionHandler = CoroutineExceptionHandler { _, t ->
+        Timber.e(t)
+    }
+
+    private val serviceScope by lazy {
+        CoroutineScope(SupervisorJob() + dispatcherProvider.io + defaultExceptionHandler)
+    }
 
     private val client by lazy {
         OkHttpClient.Builder()
@@ -54,16 +60,12 @@ class FileUploaderForegroundService : Service() {
             startForeground(1, notification.build())
 
             Timber.i("Foreground service start")
-            GlobalScope.launch(Dispatchers.Default) {
-                try {
-                    val type = intent.getStringExtra(EXTRA_KEY_TYPE)
-                    handleSendFile(file, type)
-
-                } catch (e: Exception) {
-                    Timber.e(e)
-                } finally {
-                    stopService()
-                }
+            serviceScope.launch {
+                val type = intent.getStringExtra(EXTRA_KEY_TYPE)
+                executeRequest(
+                    request = makeRequest(file, type),
+                    file = file
+                )
             }
 
         } ?: stopService()
@@ -88,48 +90,47 @@ class FileUploaderForegroundService : Service() {
         }
     }
 
-    private suspend fun handleSendFile(file: File, type: String?) {
-        makeRequest(file, type)
-    }
-
-    private suspend fun makeRequest(file: File, type: String?) {
+    private fun makeRequest(file: File, type: String?): Request {
         val body = requestBody(file, type)
 
-        val request =
-            Request.Builder()
-                .url(API_ADDRESS)
-                .post(body)
-                .build()
-
-        executeRequest(request, file)
+        return Request.Builder()
+            .url(API_ADDRESS)
+            .post(body)
+            .build()
     }
 
     private suspend fun executeRequest(request: Request, file: File) {
         Timber.i("Send file started")
+        runCatching {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Timber.e(response.body?.string())
 
-        @Suppress("BlockingMethodInNonBlockingContext")
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                Timber.e(response.body?.string())
+                    error("Unexpected code $response")
+                }
 
-                throw IOException("Unexpected code $response")
-            }
+                response.body?.string()?.let { responseBodyText ->
+                    Timber.i(responseBodyText)
 
-            response.body?.string()?.let { responseBodyText ->
-                Timber.i(responseBodyText)
+                    val url = JSONObject(responseBodyText).optString("link")
 
-                val url = JSONObject(responseBodyText).optString("link")
+                    withContext(dispatcherProvider.foreground) {
+                        setTextToClipboard(
+                            this@FileUploaderForegroundService,
+                            url
+                        )
 
-                withContext(Dispatchers.Main) {
-                    setTextToClipboard(
-                        this@FileUploaderForegroundService,
-                        url
-                    )
-
-                    sendFinishedNotification(url = url, fileName = file.name)
+                        sendFinishedNotification(url = url, fileName = file.name)
+                    }
                 }
             }
         }
+            .onFailure {
+                Timber.e(it)
+            }
+            .onSuccess {
+                stopService()
+            }
     }
 
     private fun requestBody(file: File, type: String?): MultipartBody {
@@ -185,7 +186,7 @@ class FileUploaderForegroundService : Service() {
             putExtra(EXTRA_KEY_NOTIFICATION, url)
         }
 
-        return PendingIntent.getBroadcast(this, notificationId + 2, shareUrlIntent, 0)
+        return PendingIntent.getBroadcast(this, notificationId + 2, shareUrlIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun copyUrlPendingIntent(
@@ -197,14 +198,14 @@ class FileUploaderForegroundService : Service() {
             putExtra(EXTRA_KEY_NOTIFICATION, url)
         }
 
-        return PendingIntent.getBroadcast(this, notificationId + 1, copyUrlIntent, 0)
+        return PendingIntent.getBroadcast(this, notificationId + 1, copyUrlIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun stopService() {
         // Stop service only when it is last uploading process.
         if (countUploading.decrementAndGet() == 0) {
             Timber.i("Service stopped")
-
+            serviceScope.cancel()
             stopSelf()
         }
     }
