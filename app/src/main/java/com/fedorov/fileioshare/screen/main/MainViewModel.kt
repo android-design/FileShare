@@ -24,11 +24,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class MainViewModelFactory(private val applicationContext: Context) :
+class MainViewModelFactory(
+    private val applicationContext: Context,
+    private val dispatcherProvider: DispatcherProvider,
+) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(FileHandlerImpl(applicationContext), DispatcherProvider()) as T
+        return MainViewModel(FileHandlerImpl(applicationContext), dispatcherProvider) as T
     }
 }
 
@@ -38,6 +41,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     private val _applicationState = MutableStateFlow(ApplicationState.IDLE)
+
     @FlowPreview
     val applicationState = _applicationState.debounce(TIMEOUT_MILLIS)
 
