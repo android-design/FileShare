@@ -23,8 +23,6 @@ class FileIOBroadcastReceiver : BroadcastReceiver() {
                     url
                 )
 
-                closeStatusBar(context)
-
                 showToast(context, context.getString(R.string.toast_url_copied))
             }
 
@@ -33,7 +31,6 @@ class FileIOBroadcastReceiver : BroadcastReceiver() {
 
                 if (intent.resolveActivity(context.packageManager) != null) {
                     context.startActivity(shareTextIntent)
-                    closeStatusBar(context)
                 } else {
                     showToast(context, context.getString(R.string.toast_no_app))
                 }
@@ -45,20 +42,15 @@ class FileIOBroadcastReceiver : BroadcastReceiver() {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, url)
         type = "text/plain"
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
     private fun showToast(context: Context, text: String) {
         Toast.makeText(
-                context,
-                text,
-                Toast.LENGTH_LONG
-            )
+            context,
+            text,
+            Toast.LENGTH_LONG
+        )
             .show()
-    }
-
-    private fun closeStatusBar(context: Context) {
-        val closeIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
-        context.sendBroadcast(closeIntent)
     }
 }
