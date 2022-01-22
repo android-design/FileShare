@@ -1,24 +1,25 @@
 package com.fedorov.fileioshare.screen.main
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.fedorov.fileioshare.EXTRA_KEY_FILE
 import com.fedorov.fileioshare.EXTRA_KEY_TYPE
 import com.fedorov.fileioshare.MAX_FILE_SIZE
 import com.fedorov.fileioshare.data.FileHandler
 import com.fedorov.fileioshare.data.FileHandlerImpl
 import com.fedorov.fileioshare.screen.model.ApplicationState
-import com.fedorov.fileioshare.service.FileUploaderForegroundService
 import com.fedorov.fileioshare.utils.DispatcherProvider
-import com.fedorov.fileioshare.utils.NotificationImpl.showFileSizeError
-import com.fedorov.fileioshare.utils.NotificationImpl.showNotificationError
+import com.fedorov.fileioshare.utils.Notification.showFileSizeError
+import com.fedorov.fileioshare.utils.Notification.showNotificationError
+import com.fedorov.fileioshare.worker.UploadingWorker
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,37 +41,40 @@ class MainViewModel(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    private val _applicationState = MutableStateFlow(ApplicationState.IDLE)
+    private val _applicationState = MutableSharedFlow<ApplicationState>()
 
     @FlowPreview
-    val applicationState = _applicationState.debounce(TIMEOUT_MILLIS)
+    val applicationState = _applicationState.debounce(APPLICATION_STATE_TIMEOUT_MILLIS)
 
     fun startUploadingFile(context: Context, uri: Uri, cacheDir: File) {
         viewModelScope.launch(dispatcherProvider.io) {
+            _applicationState.emit(ApplicationState.IDLE)
             val file = contentResolver.getFileOutput(uri, cacheDir)
 
             file?.let { fileOutput ->
                 if (fileOutput.length() < MAX_FILE_SIZE) {
-                    val type = contentResolver.getType(uri)
-                    startForegroundService(context, fileOutput, type)
+                    val fileData = workDataOf(
+                        EXTRA_KEY_FILE to fileOutput.name,
+                        EXTRA_KEY_TYPE to contentResolver.getType(uri),
+                    )
+
+                    val uploadWorkRequest = OneTimeWorkRequestBuilder<UploadingWorker>()
+                        .setInputData(fileData)
+                        .build()
+
+                    WorkManager.getInstance(context)
+                        .enqueue(uploadWorkRequest)
                 } else {
                     showFileSizeError(context, fileOutput.name)
                 }
-                _applicationState.value = ApplicationState.EXIT
+                _applicationState.emit(ApplicationState.EXIT)
             } ?: withContext(dispatcherProvider.foreground) {
                 showNotificationError(context)
             }
         }
     }
 
-    private fun startForegroundService(context: Context, file: File, type: String?) {
-        val serviceIntent = Intent(context, FileUploaderForegroundService::class.java)
-        serviceIntent.putExtra(EXTRA_KEY_FILE, file)
-        serviceIntent.putExtra(EXTRA_KEY_TYPE, type)
-        ContextCompat.startForegroundService(context, serviceIntent)
-    }
-
     companion object {
-        const val TIMEOUT_MILLIS: Long = 10_000
+        const val APPLICATION_STATE_TIMEOUT_MILLIS: Long = 10_000
     }
 }

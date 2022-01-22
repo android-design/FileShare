@@ -36,34 +36,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        subscribeOnAppState()
-        start()
+        checkStartFlow(intent)
     }
 
-    private fun subscribeOnAppState() {
-        viewModel.applicationState
-            .onEach {
-                when (it) {
-                    ApplicationState.IDLE -> Unit
-                    ApplicationState.EXIT -> {
-                        finish()
-                    }
-                }
-            }
-            .launchIn(lifecycleScope)
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        checkStartFlow(intent)
     }
 
-    private fun start() {
+    private fun checkStartFlow(newIntent: Intent?) {
+        val intent = newIntent ?: this.intent
         when (intent?.action) {
             Intent.ACTION_SEND -> {
-                setContentView(R.layout.uploading)
-
-                (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-                    grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                    viewModel.startUploadingFile(applicationContext, it, cacheDir)
-                }
+                startUploadingFile(intent)
             }
             else -> {
                 setContentView(R.layout.activity_main)
@@ -72,5 +57,28 @@ class MainActivity : AppCompatActivity() {
                 mainViewBinding.fileIoLink.movementMethod = LinkMovementMethod.getInstance()
             }
         }
+    }
+
+    private fun startUploadingFile(intent: Intent) {
+        setContentView(R.layout.uploading)
+        subscribeOnAppState()
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+            grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            viewModel.startUploadingFile(applicationContext, it, cacheDir)
+        }
+    }
+
+    private fun subscribeOnAppState() {
+        viewModel.applicationState
+            .onEach {
+                when (it) {
+                    ApplicationState.IDLE -> Unit
+                    ApplicationState.EXIT -> {
+                        finishAndRemoveTask()
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 }
