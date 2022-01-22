@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".screen.main.MainActivity"
+            android:launchMode="singleInstance"
             android:exported="true">
 
             <intent-filter>
@@ -34,10 +35,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.FileUploaderForegroundService"
-            android:enabled="true"
-            android:exported="false" />
         <receiver
             android:name=".broadcastReceiver.FileIOBroadcastReceiver"
             android:exported="false">

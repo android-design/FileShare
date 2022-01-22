@@ -1,13 +1,18 @@
 package com.fedorov.fileioshare.utils
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.fedorov.fileioshare.CHANNEL_ID
+import com.fedorov.fileioshare.CHANNEL_NAME
 import com.fedorov.fileioshare.GROUP_KEY_UPLOAD_FILE
 import com.fedorov.fileioshare.R
+import timber.log.Timber
 
-object NotificationImpl {
+object Notification {
     fun notificationBuilder(
         context: Context,
         contentTitle: String,
@@ -18,6 +23,7 @@ object NotificationImpl {
     )
         .setSmallIcon(R.drawable.folder_bw)
         .setContentTitle(contentTitle)
+        .setTicker(contentTitle)
         .setContentText(contentText)
 
     fun notificationGrouped(
@@ -55,6 +61,21 @@ object NotificationImpl {
         )
         NotificationManagerCompat.from(context).apply {
             notify(notificationId(), builder.build())
+        }
+    }
+
+    fun createNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = context.getSystemService(
+                NotificationManager::class.java
+            )
+            manager?.createNotificationChannel(serviceChannel)
+            Timber.d("Notification chanel created")
         }
     }
 }
