@@ -36,37 +36,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkStartFlow(intent)
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        checkStartFlow(intent)
-    }
-
-    private fun checkStartFlow(newIntent: Intent?) {
-        val intent = newIntent ?: this.intent
-        when (intent?.action) {
-            Intent.ACTION_SEND -> {
-                startUploadingFile(intent)
-            }
-            else -> {
-                setContentView(R.layout.activity_main)
-
-                // Url to site file.io
-                mainViewBinding.fileIoLink.movementMethod = LinkMovementMethod.getInstance()
-            }
-        }
-    }
-
-    private fun startUploadingFile(intent: Intent) {
-        setContentView(R.layout.uploading)
         subscribeOnAppState()
-        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-            grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-            viewModel.startUploadingFile(applicationContext, it, cacheDir)
-        }
+        checkStartFlow(intent)
     }
 
     private fun subscribeOnAppState() {
@@ -80,5 +51,45 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .launchIn(lifecycleScope)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        checkStartFlow(intent)
+    }
+
+    private fun checkStartFlow(newIntent: Intent?) {
+        val intent = newIntent ?: this.intent
+        when (intent?.action) {
+            Intent.ACTION_SEND -> {
+                setContentView(R.layout.uploading)
+                uriFromIntent(intent)?.let { uri ->
+                    startUploadingFile(listOf(uri))
+                }
+            }
+            Intent.ACTION_SEND_MULTIPLE -> {
+                setContentView(R.layout.uploading)
+                startUploadingFile(uriArrayFromIntent(intent))
+            }
+            else -> {
+                setContentView(R.layout.activity_main)
+
+                // Url to site file.io
+                mainViewBinding.fileIoLink.movementMethod = LinkMovementMethod.getInstance()
+            }
+        }
+    }
+
+    private fun uriFromIntent(intent: Intent): Uri? =
+        intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+
+    private fun uriArrayFromIntent(intent: Intent): List<Uri>? =
+        intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()
+
+    private fun startUploadingFile(uriArray: List<Uri>?) {
+        uriArray?.forEach {
+            grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            viewModel.startUploadingFile(applicationContext, it, cacheDir)
+        }
     }
 }
