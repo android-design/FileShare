@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.fedorov.fileioshare.CHANNEL_ID
@@ -12,7 +13,7 @@ import com.fedorov.fileioshare.GROUP_KEY_UPLOAD_FILE
 import com.fedorov.fileioshare.R
 import timber.log.Timber
 
-object Notification {
+object NotificationUtils {
     fun notificationBuilder(
         context: Context,
         contentTitle: String,
@@ -54,15 +55,7 @@ object Notification {
         }
     }
 
-    fun showNotificationError(context: Context) {
-        val builder = notificationGrouped(
-            context = context,
-            contentTitle = "Error. " + context.getString(R.string.error_can_not_read_file)
-        )
-        NotificationManagerCompat.from(context).apply {
-            notify(notificationId(), builder.build())
-        }
-    }
+    fun notificationId() = SystemClock.uptimeMillis().toInt()
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

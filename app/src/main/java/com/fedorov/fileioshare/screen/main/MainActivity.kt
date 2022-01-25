@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun startUploadingFile(uriArray: List<Uri>?) {
         uriArray?.forEach {
             grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            viewModel.startUploadingFile(applicationContext, it, cacheDir)
+            viewModel.startUploadingFile(applicationContext, it)
         }
     }
 }
