@@ -4,9 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.fedorov.fileioshare.utils.DispatcherProvider
 import timber.log.Timber
-
 import timber.log.Timber.DebugTree
-
 
 class App : Application() {
     val dispatcherProvider: DispatcherProvider = DispatcherProvider()

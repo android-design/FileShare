@@ -5,7 +5,6 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.InputStream
 
-
 class FileHandlerImpl(private val context: Context) : FileHandler {
 
     override fun fileNameFromUri(uri: Uri): String {
