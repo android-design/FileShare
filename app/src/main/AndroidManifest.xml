@@ -52,6 +52,11 @@
 
         </activity>
 
+        <service
+            android:name=".service.FileUploaderForegroundService"
+            android:enabled="true"
+            android:exported="false" />
+
         <receiver
             android:name=".broadcastReceiver.FileIOBroadcastReceiver"
             android:exported="false">

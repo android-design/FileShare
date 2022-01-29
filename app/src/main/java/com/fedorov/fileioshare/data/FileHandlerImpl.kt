@@ -3,42 +3,41 @@ package com.fedorov.fileioshare.data
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.fedorov.fileioshare.utils.toFile
-import timber.log.Timber
-import java.io.File
+import java.io.InputStream
 
 
 class FileHandlerImpl(private val context: Context) : FileHandler {
 
-    private fun fileNameFromUri(uri: Uri): String {
-        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            return cursor.getString(nameIndex)
-        }
-
-        return uri.path?.substringAfterLast("/") ?: ""
-    }
-
-    override fun getFileOutput(uri: Uri, cacheDir: File): File? {
-
-        try {
-            val fileName = fileNameFromUri(uri)
-
-            if (fileName.isEmpty()) {
-                throw IllegalStateException("Filename not found")
+    override fun fileNameFromUri(uri: Uri): String {
+        var fileName = ""
+        runCatching {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                cursor.moveToFirst()
+                cursor.getString(nameIndex)
             }
-
-
-            context.contentResolver.openInputStream(uri)
-                ?.let { stream ->
-                    return stream.toFile(fileName, cacheDir)
-                }
-        } catch (e: Exception) {
-            Timber.e(e)
         }
-        return null
+            .onSuccess {
+                fileName = it.orEmpty()
+            }
+            .onFailure {
+                fileName = uri.path?.substringAfterLast("/") ?: ""
+            }
+        return fileName
     }
 
-    override fun getType(uri: Uri): String? = context.contentResolver.getType(uri)
+    override fun getFileInputStream(uri: Uri): InputStream {
+        return context.contentResolver.openInputStream(uri) ?: error("No input stream")
+    }
+
+    override fun getType(uri: Uri): String = context.contentResolver.getType(uri).orEmpty()
+
+    override fun getFileSize(uri: Uri): Long {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE)
+            cursor.moveToFirst()
+            return cursor.getLong(nameIndex)
+        }
+        return 0
+    }
 }

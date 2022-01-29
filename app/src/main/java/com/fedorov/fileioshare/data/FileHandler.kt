@@ -1,9 +1,11 @@
 package com.fedorov.fileioshare.data
 
 import android.net.Uri
-import java.io.File
+import java.io.InputStream
 
 interface FileHandler {
-    fun getFileOutput(uri: Uri, cacheDir: File): File?
-    fun getType(uri:Uri):String?
+    fun getType(uri:Uri):String
+    fun getFileSize(uri: Uri): Long
+    fun fileNameFromUri(uri: Uri): String
+    fun getFileInputStream(uri: Uri): InputStream
 }
