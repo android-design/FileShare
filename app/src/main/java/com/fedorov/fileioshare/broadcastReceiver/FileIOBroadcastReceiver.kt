@@ -4,20 +4,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.fedorov.fileioshare.ACTION_COPY_URL
-import com.fedorov.fileioshare.ACTION_SHARE_URL
-import com.fedorov.fileioshare.EXTRA_KEY_NOTIFICATION
+import com.fedorov.fileioshare.Const
 import com.fedorov.fileioshare.R
 import com.fedorov.fileioshare.utils.setTextToClipboard
-
 
 class FileIOBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val url = intent.getStringExtra(EXTRA_KEY_NOTIFICATION)
+        val url = intent.getStringExtra(Const.EXTRA_KEY_NOTIFICATION)
 
         when (intent.action) {
-            ACTION_COPY_URL -> {
+            Const.ACTION_COPY_URL -> {
                 setTextToClipboard(
                     context,
                     url
@@ -26,7 +23,7 @@ class FileIOBroadcastReceiver : BroadcastReceiver() {
                 showToast(context, context.getString(R.string.toast_url_copied))
             }
 
-            ACTION_SHARE_URL -> {
+            Const.ACTION_SHARE_URL -> {
                 val shareTextIntent = getShareTextIntent(url)
 
                 if (intent.resolveActivity(context.packageManager) != null) {

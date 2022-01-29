@@ -6,12 +6,21 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import androidx.core.app.NotificationManagerCompat
-import com.fedorov.fileioshare.*
+import com.fedorov.fileioshare.Const
+import com.fedorov.fileioshare.R
 import com.fedorov.fileioshare.broadcastReceiver.FileIOBroadcastReceiver
 import com.fedorov.fileioshare.data.FileHandler
 import com.fedorov.fileioshare.data.FileHandlerImpl
-import com.fedorov.fileioshare.utils.*
-import kotlinx.coroutines.*
+import com.fedorov.fileioshare.dispatcherProvider
+import com.fedorov.fileioshare.utils.NotificationUtils
+import com.fedorov.fileioshare.utils.setTextToClipboard
+import com.fedorov.fileioshare.utils.toRequestBody
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -19,7 +28,6 @@ import okhttp3.Request
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
-
 
 class FileUploaderForegroundService : Service() {
     private val countUploading = AtomicInteger(0)
@@ -44,7 +52,7 @@ class FileUploaderForegroundService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         countUploading.incrementAndGet()
 
-        val fileUri = intent.extras?.get(EXTRA_KEY_FILE) as? Uri
+        val fileUri = intent.extras?.get(Const.EXTRA_KEY_FILE) as? Uri
 
         fileUri?.let { uri ->
 
@@ -67,7 +75,6 @@ class FileUploaderForegroundService : Service() {
                     fileName = fileName
                 )
             }
-
         } ?: stopService()
 
         return START_REDELIVER_INTENT
@@ -79,7 +86,7 @@ class FileUploaderForegroundService : Service() {
         val body = requestBody(fileUri, fileName)
 
         return Request.Builder()
-            .url(API_ADDRESS)
+            .url(Const.API_ADDRESS)
             .post(body)
             .build()
     }
@@ -87,7 +94,7 @@ class FileUploaderForegroundService : Service() {
     private fun requestBody(fileUri: Uri, filename: String): MultipartBody {
         return MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart(
-                name = FORM_DATA_PART_NAME,
+                name = Const.FORM_DATA_PART_NAME,
                 filename = filename,
                 body = contentResolver.getFileInputStream(fileUri).toRequestBody(
                     mediaType = contentResolver.getType(fileUri).toMediaTypeOrNull(),
@@ -144,15 +151,13 @@ class FileUploaderForegroundService : Service() {
 
         builder
             .addAction(
-                R.drawable.ic_content_copy, getString(
-                    R.string.notification_action_copy_title
-                ),
+                R.drawable.ic_content_copy,
+                getString(R.string.notification_action_copy_title),
                 copyUrlPendingIntent(url, notificationId)
             )
             .addAction(
-                R.drawable.ic_share, getString(
-                    R.string.notification_action_share_title
-                ),
+                R.drawable.ic_share,
+                getString(R.string.notification_action_share_title),
                 shareUrlPendingIntent(url, notificationId)
             )
 
@@ -161,7 +166,7 @@ class FileUploaderForegroundService : Service() {
         NotificationManagerCompat.from(this).apply {
             Timber.d("Notification about complete uploading sent")
             notify(notificationId, builder.build())
-            notify(3, groupSummary.build())
+            notify(Const.GROUP_NOTIFICATION_ID, groupSummary.build())
         }
     }
 
@@ -170,8 +175,8 @@ class FileUploaderForegroundService : Service() {
         notificationId: Int
     ): PendingIntent? {
         val shareUrlIntent = Intent(this, FileIOBroadcastReceiver::class.java).apply {
-            action = ACTION_SHARE_URL
-            putExtra(EXTRA_KEY_NOTIFICATION, url)
+            action = Const.ACTION_SHARE_URL
+            putExtra(Const.EXTRA_KEY_NOTIFICATION, url)
         }
 
         return PendingIntent.getBroadcast(
@@ -187,8 +192,8 @@ class FileUploaderForegroundService : Service() {
         notificationId: Int
     ): PendingIntent? {
         val copyUrlIntent = Intent(this, FileIOBroadcastReceiver::class.java).apply {
-            action = ACTION_COPY_URL
-            putExtra(EXTRA_KEY_NOTIFICATION, url)
+            action = Const.ACTION_COPY_URL
+            putExtra(Const.EXTRA_KEY_NOTIFICATION, url)
         }
 
         return PendingIntent.getBroadcast(

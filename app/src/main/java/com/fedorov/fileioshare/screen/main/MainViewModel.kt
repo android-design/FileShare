@@ -7,8 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.fedorov.fileioshare.EXTRA_KEY_FILE
-import com.fedorov.fileioshare.MAX_FILE_SIZE
+import com.fedorov.fileioshare.Const
 import com.fedorov.fileioshare.data.FileHandler
 import com.fedorov.fileioshare.data.FileHandlerImpl
 import com.fedorov.fileioshare.screen.model.ApplicationState
@@ -44,7 +43,7 @@ class MainViewModel(
     fun startUploadingFile(context: Context, uri: Uri) {
         viewModelScope.launch(dispatcherProvider.io) {
             _applicationState.emit(ApplicationState.IDLE)
-            if (contentResolver.getFileSize(uri) < MAX_FILE_SIZE) {
+            if (contentResolver.getFileSize(uri) < Const.MAX_FILE_SIZE) {
                 startForegroundService(context, uri)
             } else {
                 showFileSizeError(context, contentResolver.fileNameFromUri(uri))
@@ -55,7 +54,7 @@ class MainViewModel(
 
     private fun startForegroundService(context: Context, uri: Uri) {
         val serviceIntent = Intent(context, FileUploaderForegroundService::class.java)
-        serviceIntent.putExtra(EXTRA_KEY_FILE, uri)
+        serviceIntent.putExtra(Const.EXTRA_KEY_FILE, uri)
         ContextCompat.startForegroundService(context, serviceIntent)
     }
 
