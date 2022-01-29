@@ -1,4 +1,4 @@
-package com.fedorov.fileioshare.screen.main
+package com.fedorov.fileioshare.presentation.screen.main
 
 import android.content.Intent
 import android.net.Uri
@@ -13,7 +13,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.fedorov.fileioshare.R
 import com.fedorov.fileioshare.databinding.ActivityMainBinding
 import com.fedorov.fileioshare.dispatcherProvider
-import com.fedorov.fileioshare.screen.model.ApplicationState
+import com.fedorov.fileioshare.model.ApplicationState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
