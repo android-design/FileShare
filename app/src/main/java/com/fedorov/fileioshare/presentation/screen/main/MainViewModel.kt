@@ -1,4 +1,4 @@
-package com.fedorov.fileioshare.screen.main
+package com.fedorov.fileioshare.presentation.screen.main
 
 import android.content.Context
 import android.content.Intent
@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.fedorov.fileioshare.Const
 import com.fedorov.fileioshare.data.FileHandler
 import com.fedorov.fileioshare.data.FileHandlerImpl
-import com.fedorov.fileioshare.screen.model.ApplicationState
+import com.fedorov.fileioshare.model.ApplicationState
 import com.fedorov.fileioshare.service.FileUploaderForegroundService
 import com.fedorov.fileioshare.utils.DispatcherProvider
 import com.fedorov.fileioshare.utils.NotificationUtils.showFileSizeError

@@ -1,4 +1,4 @@
-package com.fedorov.fileioshare.screen.model
+package com.fedorov.fileioshare.model
 
 enum class ApplicationState {
     IDLE,

@@ -1,7 +1,6 @@
 package com.fedorov.fileioshare
 
 object Const {
-    const val API_ADDRESS = "https://file.io"
     const val CLIPBOARD_LABEL = "Shared url"
     const val EXTRA_KEY_FILE = "EXTRA_KEY_FILE"
     const val FORM_DATA_PART_NAME = "file"

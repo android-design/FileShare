@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".screen.main.MainActivity"
+            android:name="com.fedorov.fileioshare.presentation.screen.main.MainActivity"
             android:launchMode="singleInstance"
             android:exported="true">
 
