@@ -8,6 +8,8 @@ import com.fedorov.fileioshare.Const
 import com.fedorov.fileioshare.dispatcherProvider
 import com.fedorov.fileioshare.notification
 import com.fedorov.fileioshare.service.model.ResultState
+import com.fedorov.fileioshare.service.notification.NotificationForeground
+import com.fedorov.fileioshare.service.notification.NotificationForegroundImpl
 import com.fedorov.fileioshare.sharingService
 import com.fedorov.fileioshare.utils.setTextToClipboard
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -39,9 +41,10 @@ class FileUploaderForegroundService : Service() {
         val fileUri = intent.extras?.get(Const.EXTRA_KEY_FILE) as? Uri
 
         fileUri?.let { uri ->
-            notification.createNotificationChannel()
+            val notificationForeground: NotificationForeground = NotificationForegroundImpl(this)
+            notificationForeground.createNotificationChannel()
 
-            startForeground(1, notification.foregroundNotification())
+            startForeground(1, notificationForeground.foregroundNotification())
             Timber.d("Foreground service started")
 
             serviceScope.launch {

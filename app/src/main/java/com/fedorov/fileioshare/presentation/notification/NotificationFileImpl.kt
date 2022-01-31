@@ -94,14 +94,4 @@ class NotificationFileImpl(
             notify(Const.GROUP_NOTIFICATION_ID, groupSummary.build())
         }
     }
-
-    override fun createNotificationChannel() {
-        NotificationUtils.createNotificationChannel(context)
-    }
-
-    override fun foregroundNotification() = NotificationUtils.notificationBuilder(
-        context,
-        context.getString(R.string.app_name),
-        context.getString(R.string.notification_uploading_content_text)
-    ).build()
 }
