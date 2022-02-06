@@ -7,11 +7,15 @@ import android.os.Parcelable
 import android.text.method.LinkMovementMethod
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.fedorov.fileioshare.R
 import com.fedorov.fileioshare.databinding.ActivityMainBinding
+import com.fedorov.fileioshare.databinding.UploadingBinding
 import com.fedorov.fileioshare.dispatcherProvider
 import com.fedorov.fileioshare.model.ApplicationState
 import kotlinx.coroutines.FlowPreview
@@ -32,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val mainViewBinding by viewBinding(ActivityMainBinding::bind)
+    private val sendViewBinding by viewBinding(UploadingBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +67,14 @@ class MainActivity : AppCompatActivity() {
         when (intent?.action) {
             Intent.ACTION_SEND -> {
                 setContentView(R.layout.uploading)
+                hideSystemUI()
                 uriFromIntent(intent)?.let { uri ->
                     startUploadingFile(listOf(uri))
                 }
             }
             Intent.ACTION_SEND_MULTIPLE -> {
                 setContentView(R.layout.uploading)
+                hideSystemUI()
                 startUploadingFile(uriArrayFromIntent(intent))
             }
             else -> {
@@ -90,5 +97,13 @@ class MainActivity : AppCompatActivity() {
             grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             viewModel.startUploadingFile(applicationContext, it)
         }
+    }
+
+    private fun hideSystemUI() {
+        val windowInsetsController =
+            ViewCompat.getWindowInsetsController(sendViewBinding.root) ?: return
+        windowInsetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 }
