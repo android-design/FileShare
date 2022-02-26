@@ -16,4 +16,7 @@
     <string name="error_can_not_read_file">Can\'t read file.</string>
     <string name="error_file_size">file size should be less then 5 Gb.</string>
     <string name="image_description_updating">Updating</string>
+    <string name="title_activity_send">SendActivity</string>
+    <string name="sending_text">Sending</string>
+    <string name="send_text">Sent successfully</string>
 </resources>

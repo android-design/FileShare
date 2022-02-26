@@ -31,6 +31,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".presentation.screen.send.SendActivity"
+            android:exported="true"
+            android:label="@string/title_activity_send"
+            android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -52,7 +59,6 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
-
         <service
             android:name=".service.FileUploaderForegroundService"
             android:enabled="true"
