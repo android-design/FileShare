@@ -1,4 +1,4 @@
-package com.fedorov.fileioshare.presentation.screen.main
+package com.fedorov.fileioshare.presentation.screen.send
 
 import android.content.Context
 import android.content.Intent
@@ -19,18 +19,18 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
-class MainViewModelFactory(
+class SendViewModelFactory(
     private val applicationContext: Context,
     private val dispatcherProvider: DispatcherProvider,
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(FileHandlerImpl(applicationContext), dispatcherProvider) as T
+        return SendViewModel(FileHandlerImpl(applicationContext), dispatcherProvider) as T
     }
 }
 
-class MainViewModel(
+class SendViewModel(
     private val contentResolver: FileHandler,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {

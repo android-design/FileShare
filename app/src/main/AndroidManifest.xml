@@ -8,6 +8,7 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.SEND" />
+
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
@@ -22,36 +23,42 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.fedorov.fileioshare.presentation.screen.main.MainActivity"
-            android:launchMode="singleInstance"
-            android:exported="true">
-
+            android:name=".presentation.screen.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="application/*" />
-                <data android:mimeType="image/*" />
-                <data android:mimeType="video/*" />
-                <data android:mimeType="audio/*" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="application/*" />
-                <data android:mimeType="image/*" />
-                <data android:mimeType="video/*" />
-                <data android:mimeType="audio/*" />
-            </intent-filter>
-
         </activity>
 
+        <activity
+            android:name=".presentation.screen.send.SendActivity"
+            android:exported="true"
+            android:label="@string/title_activity_send"
+            android:theme="@style/Theme.AppCompat.Translucent">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
         <service
             android:name=".service.FileUploaderForegroundService"
             android:enabled="true"
